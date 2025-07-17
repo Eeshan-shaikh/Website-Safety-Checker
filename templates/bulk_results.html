@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Bulk URL Check Results - URL Safety Checker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0"><i class="fas fa-list-check me-2"></i>Bulk URL Check Results</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>We've analyzed multiple URLs for safety. Below are the results of your bulk check.
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">URL</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Reputation</th>
+                                <th scope="col">Threat Level</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td><a href="{{ result.url }}" target="_blank" rel="noopener noreferrer">{{ result.url }}</a></td>
+                                <td>
+                                    {% if result.is_safe %}
+                                    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Safe</span>
+                                    {% else %}
+                                    <span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i>Potentially Unsafe</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% set score = result.reputation_score %}
+                                    {% set score_color = 'success' if score >= 80 else 'warning' if score >= 50 else 'danger' %}
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-{{ score_color }}" role="progressbar" 
+                                            style="width: {{ score }}%;" 
+                                            aria-valuenow="{{ score }}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <span class="ms-2 {{ 'text-success' if score >= 80 else 'text-warning' if score >= 50 else 'text-danger' }}">
+                                        {{ score }}/100
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if result.threat_level == 'Low' else 
+                                                      'warning' if result.threat_level == 'Medium' else 
+                                                      'danger' if result.threat_level == 'High' else 
+                                                      'dark' if result.threat_level == 'Critical' else 'info' }}">
+                                        {{ result.threat_level }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-secondary copy-url" data-url="{{ result.url }}" data-bs-toggle="tooltip" title="Copy URL">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <a href="{{ url_for('dashboard') }}?url={{ result.url }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Detailed Analysis">
+                                            <i class="fas fa-search"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Summary Statistics -->
+                <div class="mt-4">
+                    <h5 class="mb-3"><i class="fas fa-chart-pie me-2"></i>Summary</h5>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total URLs</h5>
+                                    <p class="card-text fs-3">{{ results|length }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Safe URLs</h5>
+                                    <p class="card-text fs-3">{{ results|selectattr('is_safe')|list|length }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger text-white mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Unsafe URLs</h5>
+                                    <p class="card-text fs-3">{{ results|rejectattr('is_safe')|list|length }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Return to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Add copy to clipboard functionality
+    document.querySelectorAll('.copy-url').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var url = this.getAttribute('data-url');
+            navigator.clipboard.writeText(url).then(function() {
+                // Show tooltip or notification
+                var tooltip = new bootstrap.Tooltip(button, {
+                    title: 'Copied!',
+                    trigger: 'manual'
+                });
+                tooltip.show();
+                setTimeout(function() {
+                    tooltip.hide();
+                }, 1000);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

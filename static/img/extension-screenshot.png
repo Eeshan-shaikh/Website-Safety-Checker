@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00a8ff" />
+      <stop offset="100%" stop-color="#0056b3" />
+    </linearGradient>
+    <linearGradient id="resultGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#28a745" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#28a745" stop-opacity="0.3" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" rx="4" fill="#333" />
+  
+  <!-- Popup Window -->
+  <rect x="50" y="20" width="300" height="260" rx="6" fill="#222" stroke="#444" stroke-width="1" />
+  
+  <!-- Header -->
+  <rect x="50" y="20" width="300" height="50" rx="6" fill="url(#headerGradient)" />
+  <text x="110" y="50" fill="white" font-family="Arial" font-size="16" font-weight="bold">URL Safety Checker</text>
+  <circle cx="80" cy="45" r="12" fill="#0066aa" stroke="#fff" stroke-width="1" />
+  <text x="77" cy="51" fill="white" font-family="Arial" font-size="18" font-weight="bold">!</text>
+
+  <!-- URL Input Area -->
+  <rect x="70" y="90" width="260" height="34" rx="4" fill="#444" />
+  <rect x="70" y="90" width="200" height="34" rx="4" fill="#333" />
+  <text x="80" y="112" fill="#ccc" font-family="Arial" font-size="12">example.com</text>
+  <rect x="270" y="90" width="60" height="34" rx="4" fill="#00a8ff" />
+  <text x="287" y="112" fill="white" font-family="Arial" font-size="12" font-weight="bold">Check</text>
+  
+  <!-- Results Area -->
+  <rect x="70" y="140" width="260" height="100" rx="6" fill="url(#resultGradient)" stroke="#28a745" stroke-width="1" />
+  
+  <!-- Results Content -->
+  <text x="85" y="165" fill="white" font-family="Arial" font-size="14" font-weight="bold">✓ URL appears to be safe</text>
+  <text x="85" y="190" fill="#ccc" font-family="Arial" font-size="12">Safety Score: 92/100</text>
+  
+  <!-- Progress bar -->
+  <rect x="85" y="200" width="230" height="8" rx="4" fill="#444" />
+  <rect x="85" y="200" width="210" height="8" rx="4" fill="#28a745" />
+  
+  <!-- Threat level -->
+  <text x="85" y="225" fill="#ccc" font-family="Arial" font-size="12">Threat Level: Low</text>
+  <rect x="180" y="215" width="50" height="18" rx="9" fill="#28a745" />
+  <text x="190" y="228" fill="white" font-family="Arial" font-size="10" font-weight="bold">LOW</text>
+</svg>

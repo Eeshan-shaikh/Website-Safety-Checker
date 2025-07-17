@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feedback - URL Safety Checker</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* Reset & base */
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #121212;
+        color: #ddd;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+        line-height: 1.5;
+      }
+      /* Container */
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 15px;
+      }
+      /* Card */
+      .card {
+        background: #1e1e1e;
+        border-radius: 10px;
+        box-shadow: 0 8px 16px rgba(111, 44, 145, 0.5);
+        margin-bottom: 24px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(111, 44, 145, 0.8);
+      }
+      /* Card header */
+      .card-header {
+        padding: 16px 20px;
+        background-color: #6f2c91;
+        color: white;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.25rem;
+        user-select: none;
+      }
+      /* Card body */
+      .card-body {
+        padding: 20px;
+        font-size: 1rem;
+      }
+      /* Form styles */
+      form label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #c6a1e1;
+      }
+      .input-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .input-group-text {
+        background: #3c3c3c;
+        border: 1px solid #6f2c91;
+        padding: 10px 12px;
+        color: #bb99e8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px 0 0 6px;
+        font-size: 1.2rem;
+        user-select: none;
+      }
+      input[type="email"],
+      input[type="text"],
+      select,
+      textarea {
+        flex: 1;
+        padding: 10px 12px;
+        background: #2c2c2c;
+        border: 1px solid #6f2c91;
+        border-left: none;
+        border-radius: 0 6px 6px 0;
+        color: #ddd;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+        outline: none;
+      }
+      select {
+        border-left: 1px solid #6f2c91;
+        border-radius: 6px;
+      }
+      input[type="email"]:focus,
+      input[type="text"]:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #9b59b6;
+        box-shadow: 0 0 8px #9b59b6;
+        background: #3a2a58;
+        color: #f0e5ff;
+      }
+      textarea {
+        resize: vertical;
+        border-radius: 6px;
+        border-left: 1px solid #6f2c91;
+        background: #2c2c2c;
+        min-height: 120px;
+      }
+      .form-text {
+        font-size: 0.85rem;
+        color: #a98de8;
+        margin-top: -8px;
+        margin-bottom: 8px;
+      }
+      /* Submit button */
+      .btn-submit {
+        background-color: #6f2c91;
+        color: white;
+        font-weight: 700;
+        padding: 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        transition: background-color 0.3s, transform 0.2s;
+        user-select: none;
+      }
+      .btn-submit:hover,
+      .btn-submit:focus {
+        background-color: #9b59b6;
+        transform: scale(1.05);
+        outline: none;
+      }
+      /* FAQ Accordion */
+      .accordion {
+        background: #2d2d2d;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(111, 44, 145, 0.4);
+      }
+      .accordion-item:not(:last-child) {
+        border-bottom: 1px solid #6f2c91;
+      }
+      .accordion-header {
+        background: #3e2e60;
+      }
+      .accordion-button {
+        all: unset;
+        display: flex;
+        width: 100%;
+        padding: 14px 20px;
+        color: #d1b3ff;
+        font-weight: 700;
+        cursor: pointer;
+        position: relative;
+        user-select: none;
+        transition: background-color 0.3s;
+      }
+      .accordion-button::after {
+        content: "\f078"; /* FontAwesome chevron-down */
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: transform 0.3s ease;
+        pointer-events: none;
+      }
+      .accordion-button.active {
+        background-color: #6f2c91;
+        color: white;
+      }
+      .accordion-button.active::after {
+        transform: translateY(-50%) rotate(180deg);
+      }
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        color: #c9b3e1;
+        background-color: #2b1f44;
+        padding: 0 20px;
+        transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+        font-weight: 500;
+        font-size: 0.95rem;
+        border-left: 4px solid #9b59b6;
+      }
+      .accordion-content.open {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        max-height: 200px;
+        transition: max-height 0.5s ease-in, padding 0.5s ease-in;
+      }
+      /* Responsive */
+      @media (max-width: 600px) {
+        .card-header,
+        .accordion-button {
+          font-size: 1.1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Feedback Card -->
+      <section class="card" aria-label="Send Feedback">
+        <header class="card-header">
+          <i class="fas fa-comment-alt"></i> Send Feedback
+        </header>
+        <article class="card-body">
+          <p>
+            We're constantly working to improve our URL safety checker. Your
+            feedback helps us enhance our service and provide better protection
+            against online threats.
+          </p>
+
+          <form
+            method="post"
+            action="https://formspree.io/f/mwpowvyd"
+            novalidate
+          >
+            <!-- Email -->
+            <label for="email">Email (optional)</label>
+            <div class="input-group" style="margin-bottom: 16px">
+              <span class="input-group-text"
+                ><i class="fas fa-envelope"></i
+              ></span>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Your email address"
+              />
+            </div>
+            <small class="form-text"
+              >We'll only use this to follow up if needed</small
+            >
+
+            <!-- Feedback Type -->
+            <label for="feedback_type">Feedback Type</label>
+            <select
+              id="feedback_type"
+              name="feedback_type"
+              style="margin-bottom: 16px"
+            >
+              <option value="suggestion">Suggestion</option>
+              <option value="issue">Report an Issue</option>
+              <option value="false_positive">Report False Positive</option>
+              <option value="false_negative">Report False Negative</option>
+              <option value="general">General Feedback</option>
+            </select>
+
+            <!-- Message -->
+            <label for="message">Your Feedback</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="5"
+              placeholder="Please share your thoughts, suggestions, or report issues..."
+              required
+            ></textarea>
+
+            <!-- Related URL -->
+            <label for="url" style="margin-top: 16px"
+              >Related URL (optional)</label
+            >
+            <div class="input-group" style="margin-bottom: 24px">
+              <span class="input-group-text"><i class="fas fa-link"></i></span>
+              <input
+                id="url"
+                name="url"
+                type="text"
+                placeholder="Enter URL if your feedback is about a specific check"
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="btn-submit"
+              aria-label="Submit Feedback"
+            >
+              <i class="fas fa-paper-plane"></i> Submit Feedback
+            </button>
+          </form>
+        </article>
+      </section>
+
+      <!-- FAQ Card -->
+      <section class="card" aria-label="Frequently Asked Questions">
+        <header class="card-header" style="background-color: #9b59b6">
+          <i class="fas fa-question-circle"></i> Frequently Asked Questions
+        </header>
+        <article class="card-body">
+          <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+              <button
+                class="accordion-button"
+                aria-expanded="false"
+                aria-controls="faq1-content"
+                aria-labelledby="faq1-header"
+                id="faq1-header"
+              >
+                How does the URL safety checker work?
+              </button>
+              <div
+                class="accordion-content"
+                id="faq1-content"
+                role="region"
+                aria-labelledby="faq1-header"
+                tabindex="0"
+              >
+                Our URL safety checker uses machine learning algorithms to
+                analyze various aspects of a URL, including its structure,
+                domain reputation, and content patterns. We look for common
+                indicators of phishing, malware distribution, and other
+                malicious activities.
+              </div>
+            </div>
+            <!-- Additional FAQ items can be added here following the same markup -->
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <script>
+      // Accordion toggle functionality
+      document.querySelectorAll(".accordion-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const content = button.nextElementSibling;
+          const isOpen = content.classList.contains("open");
+
+          // Close any open accordion content
+          document
+            .querySelectorAll(".accordion-content.open")
+            .forEach((openContent) => {
+              openContent.classList.remove("open");
+              openContent.previousElementSibling.classList.remove("active");
+              openContent.previousElementSibling.setAttribute(
+                "aria-expanded",
+                "false"
+              );
+            });
+
+          if (!isOpen) {
+            content.classList.add("open");
+            button.classList.add("active");
+            button.setAttribute("aria-expanded", "true");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Browser Extension - URL Safety Checker{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="text-center mb-4">URL Safety Checker Browser Extension</h1>
+            
+            <div class="card bg-dark mb-4">
+                <div class="card-body p-4">
+                    <h2 class="card-title"><i class="fas fa-puzzle-piece text-info me-2"></i>Real-time URL Safety Protection</h2>
+                    <p class="card-text">
+                        Our browser extension provides real-time protection as you browse the web. It analyzes URLs before you visit them and warns you about potentially unsafe websites.
+                    </p>
+                    
+                    <div class="d-flex justify-content-center my-4">
+                        <div class="text-center p-3 bg-dark rounded shadow-sm" style="max-width: 400px;">
+                            <img src="{{ url_for('static', filename='img/extension-screenshot.png') }}" class="img-fluid rounded mb-3" alt="Extension Screenshot" style="max-height: 300px;">
+                            <h5 class="text-info">URL Safety Browser Extension</h5>
+                        </div>
+                    </div>
+                    
+                    <h3 class="mt-4 mb-3">Key Features:</h3>
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item bg-dark">
+                            <i class="fas fa-shield-alt text-success me-2"></i>
+                            <strong>Real-time URL checking</strong> - Automatically scans URLs before you visit them
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            <strong>Safety warnings</strong> - Shows interstitial warnings for potentially unsafe sites
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <i class="fas fa-search text-info me-2"></i>
+                            <strong>Link scanning</strong> - Highlights potentially unsafe links on web pages
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <i class="fas fa-chart-bar text-primary me-2"></i>
+                            <strong>Detailed analysis</strong> - Provides comprehensive safety information about URLs
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card bg-dark mb-4">
+                <div class="card-body p-4">
+                    <h2 class="card-title"><i class="fas fa-download text-success me-2"></i>Installation Instructions</h2>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> Our extension is currently in development and will be available in browser stores soon.
+                    </div>
+                    
+                    <h3 class="mt-4">Manual Installation</h3>
+                    <ol class="list-group list-group-flush mb-4">
+                        <li class="list-group-item bg-dark">
+                            <span class="badge bg-primary me-2">Step 1</span>
+                            <a href="{{ url_for('static', filename='url-safety-extension.zip') }}" class="btn btn-outline-info btn-sm me-3">
+                                <i class="fas fa-download me-1"></i> Download Extension
+                            </a>
+                            Download and unzip the extension package
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <span class="badge bg-primary me-2">Step 2</span>
+                            Open your browser's extension page:
+                            <ul class="mt-2">
+                                <li>Chrome: Navigate to <code>chrome://extensions</code></li>
+                                <li>Firefox: Navigate to <code>about:addons</code></li>
+                                <li>Edge: Navigate to <code>edge://extensions</code></li>
+                            </ul>
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <span class="badge bg-primary me-2">Step 3</span>
+                            Enable "Developer mode" (usually a toggle in the top-right corner)
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <span class="badge bg-primary me-2">Step 4</span>
+                            Click "Load unpacked" (Chrome/Edge) or "Load Temporary Add-on" (Firefox) and select the extracted extension folder
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <span class="badge bg-primary me-2">Step 5</span>
+                            The extension should now appear in your browser toolbar
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="card bg-dark mb-4">
+                <div class="card-body p-4">
+                    <h2 class="card-title"><i class="fas fa-user-check text-warning me-2"></i>Using the Extension</h2>
+                    
+                    <h4 class="mt-3 mb-3">Basic Usage:</h4>
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item bg-dark">
+                            <strong>Icon Click:</strong> Click the extension icon to check the safety of the current page
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <strong>Automatic Scanning:</strong> The extension automatically scans URLs before you visit them
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <strong>Warning Screens:</strong> For potentially unsafe sites, a warning screen will appear before loading the page
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <strong>Link Highlighting:</strong> Unsafe links on web pages will be highlighted with a red border and warning icon
+                        </li>
+                    </ul>
+                    
+                    <h4 class="mt-4 mb-3">Configuration:</h4>
+                    <p>
+                        Right-click the extension icon and select "Options" to configure the extension settings:
+                    </p>
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item bg-dark">
+                            <strong>Protection Level:</strong> Adjust the sensitivity of the URL safety checks
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <strong>Notifications:</strong> Configure notification preferences
+                        </li>
+                        <li class="list-group-item bg-dark">
+                            <strong>Whitelist:</strong> Add trusted domains to the whitelist
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

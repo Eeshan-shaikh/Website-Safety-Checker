@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00a8ff" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#005eff" stop-opacity="0.9" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10" />
+      <feOffset dx="0" dy="0" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.7" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <path d="M466.5,83.7l-192-80c-4.9-2-10.1-2-15,0l-192,80C58.8,88.1,54,96.7,54,106.1v143.8c0,86.3,62.8,164.2,147.3,178.3 C209,428.8,216,429,224,429c72.9,0,138.7-40.6,164.4-106c10.2-26,15.6-53.7,15.6-81.8V106.1C404,96.7,399.2,88.1,390.5,83.7z" 
+  fill="none" stroke="white" stroke-width="20" filter="url(#shadow)" />
+  <path d="M466.5,83.7l-192-80c-4.9-2-10.1-2-15,0l-192,80C58.8,88.1,54,96.7,54,106.1v143.8c0,86.3,62.8,164.2,147.3,178.3 C209,428.8,216,429,224,429c72.9,0,138.7-40.6,164.4-106c10.2-26,15.6-53.7,15.6-81.8V106.1C404,96.7,399.2,88.1,390.5,83.7z" 
+  fill="url(#glow)" />
+</svg>

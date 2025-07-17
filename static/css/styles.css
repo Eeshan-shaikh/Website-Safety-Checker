@@ -1,0 +1,114 @@
+/* Custom styles for URL Safety Checker */
+:root {
+  --primary-blue: #00a8ff;
+  --safe-green: #28a745;
+  --unsafe-red: #dc3545;
+  --neutral-gray: #6c757d;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 1rem 0;
+}
+
+.logo-icon {
+  max-width: 40px;
+  margin-right: 10px;
+}
+
+.card-header-safe {
+  background-color: var(--safe-green);
+  color: white;
+}
+
+.card-header-unsafe {
+  background-color: var(--unsafe-red);
+  color: white;
+}
+
+.prediction-safe {
+  color: var(--safe-green);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.prediction-unsafe {
+  color: var(--unsafe-red);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.history-item {
+  border-left: 5px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.history-item:hover {
+  transform: translateX(3px);
+}
+
+.history-safe {
+  border-left-color: var(--safe-green);
+}
+
+.history-unsafe {
+  border-left-color: var(--unsafe-red);
+}
+
+.threat-card {
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.threat-high {
+  border-left: 5px solid var(--unsafe-red);
+}
+
+.threat-medium {
+  border-left: 5px solid #ffc107;
+}
+
+.threat-low {
+  border-left: 5px solid #17a2b8;
+}
+
+.shield-icon {
+  fill: var(--primary-blue);
+  height: 24px;
+  width: 24px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+/* Add subtle animation to the clear history button */
+.btn-clear-history {
+  transition: all 0.3s ease;
+}
+
+.btn-clear-history:hover {
+  transform: scale(1.05);
+}
+
+/* Badge styling for history items */
+.badge-safe {
+  background-color: var(--safe-green);
+  color: white;
+}
+
+.badge-unsafe {
+  background-color: var(--unsafe-red);
+  color: white;
+}

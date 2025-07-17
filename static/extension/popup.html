@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>URL Safety Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 340px;
+      margin: 0;
+      padding: 0;
+      background-color: #222;
+      color: #eee;
+    }
+    
+    .header {
+      background-color: #00a8ff;
+      color: white;
+      padding: 12px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .header img {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+    
+    .content {
+      padding: 16px;
+    }
+    
+    .url-input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background-color: #333;
+      color: #fff;
+      box-sizing: border-box;
+    }
+    
+    .check-button {
+      width: 100%;
+      padding: 10px;
+      background-color: #00a8ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .check-button:hover {
+      background-color: #0090e0;
+    }
+    
+    .result {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 4px;
+    }
+    
+    .safe {
+      background-color: rgba(40, 167, 69, 0.2);
+      border: 1px solid #28a745;
+    }
+    
+    .unsafe {
+      background-color: rgba(220, 53, 69, 0.2);
+      border: 1px solid #dc3545;
+    }
+    
+    .loading {
+      text-align: center;
+      margin-top: 16px;
+    }
+    
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #00a8ff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .score-container {
+      margin: 12px 0;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      width: 100%;
+      background-color: #444;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-value {
+      height: 100%;
+      border-radius: 4px;
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+    }
+    
+    .threats {
+      margin-top: 12px;
+    }
+    
+    .threat-item {
+      margin-bottom: 8px;
+      padding: 8px;
+      background-color: rgba(0,0,0,0.2);
+      border-radius: 4px;
+    }
+    
+    .threat-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 12px;
+      font-size: 12px;
+      color: #777;
+    }
+    
+    .footer a {
+      color: #00a8ff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="icons/icon48.png" alt="URL Safety Checker">
+    <h1>URL Safety Checker</h1>
+  </div>
+  
+  <div class="content">
+    <input type="text" id="urlInput" class="url-input" placeholder="Enter URL to check...">
+    <button id="checkButton" class="check-button">Check URL Safety</button>
+    
+    <div id="loading" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Analyzing URL...</p>
+    </div>
+    
+    <div id="result" class="result" style="display: none;"></div>
+  </div>
+  
+  <div class="footer">
+    <p>Powered by <a href="#" id="dashboardLink">URL Safety Checker</a></p>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

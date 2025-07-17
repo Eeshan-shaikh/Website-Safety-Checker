@@ -1,0 +1,488 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - URL Safety Checker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-10 mx-auto">
+        <!-- Safety Statistics Card -->
+        {% if stats and stats.total_checks > 0 %}
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white">
+                <h3 class="card-title mb-0"><i class="fas fa-chart-pie me-2"></i>Your URL Safety Statistics</h3>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Checks</h5>
+                                <p class="card-text fs-3">{{ stats.total_checks }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Safe URLs</h5>
+                                <p class="card-text fs-3">{{ stats.safe_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Unsafe URLs</h5>
+                                <p class="card-text fs-3">{{ stats.unsafe_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="progress" style="height: 25px;">
+                        {% if stats.total_checks > 0 %}
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                style="width: {{ (stats.safe_count / stats.total_checks * 100) | round }}%;" 
+                                aria-valuenow="{{ stats.safe_count }}" aria-valuemin="0" aria-valuemax="{{ stats.total_checks }}">
+                                {{ (stats.safe_count / stats.total_checks * 100) | round }}% Safe
+                            </div>
+                            <div class="progress-bar bg-danger" role="progressbar" 
+                                style="width: {{ (stats.unsafe_count / stats.total_checks * 100) | round }}%;" 
+                                aria-valuenow="{{ stats.unsafe_count }}" aria-valuemin="0" aria-valuemax="{{ stats.total_checks }}">
+                                {{ (stats.unsafe_count / stats.total_checks * 100) | round }}% Unsafe
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- URL Check Tools -->
+        <ul class="nav nav-tabs" id="urlCheckTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="single-check-tab" data-bs-toggle="tab" data-bs-target="#single-check" type="button" role="tab" aria-controls="single-check" aria-selected="true">
+                    <i class="fas fa-link me-1"></i> Single URL Check
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="bulk-check-tab" data-bs-toggle="tab" data-bs-target="#bulk-check" type="button" role="tab" aria-controls="bulk-check" aria-selected="false">
+                    <i class="fas fa-list-check me-1"></i> Bulk URL Check
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" href="{{ url_for('extension_page') }}">
+                    <i class="fas fa-puzzle-piece me-1"></i> Browser Extension
+                </a>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="urlCheckTabsContent">
+            <!-- Single URL Check Tab -->
+            <div class="tab-pane fade show active" id="single-check" role="tabpanel" aria-labelledby="single-check-tab">
+                <div class="card shadow border-top-0 rounded-0 rounded-bottom">
+                    <div class="card-body">
+                        <form method="post" action="{{ url_for('dashboard') }}">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class="fas fa-link"></i>
+                                </span>
+                                <input type="text" class="form-control" id="url-input" name="url" placeholder="Enter URL to check (e.g., example.com)" value="{{ url if url }}">
+                                <button type="submit" class="btn btn-primary" id="check-button">
+                                    <i class="fas fa-shield-alt me-2"></i>Check Safety
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                We'll check this URL for safety and provide detailed threat analysis
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bulk URL Check Tab -->
+            <div class="tab-pane fade" id="bulk-check" role="tabpanel" aria-labelledby="bulk-check-tab">
+                <div class="card shadow border-top-0 rounded-0 rounded-bottom">
+                    <div class="card-body">
+                        <form method="post" action="{{ url_for('dashboard') }}">
+                            <div class="mb-3">
+                                <label for="bulk-urls" class="form-label">Multiple URLs (one per line)</label>
+                                <textarea class="form-control" id="bulk-urls" name="bulk_urls" rows="5" placeholder="Enter each URL on a new line:&#10;example1.com&#10;example2.com&#10;example3.com"></textarea>
+                            </div>
+                            <div class="form-text mb-3">
+                                Analyze multiple URLs at once. Results will be provided in a summary report.
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-shield-alt me-2"></i>Check All URLs
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if prediction is not none %}
+<div class="row mb-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header {% if prediction %}card-header-safe{% else %}card-header-unsafe{% endif %}">
+                <h3 class="card-title mb-0">
+                    {% if prediction %}
+                    <i class="fas fa-check-circle me-2"></i>URL Safety Result: SAFE
+                    {% else %}
+                    <i class="fas fa-exclamation-triangle me-2"></i>URL Safety Result: POTENTIALLY UNSAFE
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="card-body">
+                <h5 class="mb-3">Analyzed URL: <span class="text-primary">{{ url }}</span></h5>
+                
+                <div class="row mb-4">
+                    <div class="col-md-7">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                {% if prediction %}
+                                <i class="fas fa-shield-alt fa-3x text-success"></i>
+                                {% else %}
+                                <i class="fas fa-exclamation-circle fa-3x text-danger"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h5 class="{% if prediction %}prediction-safe{% else %}prediction-unsafe{% endif %}">
+                                    {% if prediction %}
+                                    This URL appears to be safe
+                                    {% else %}
+                                    This URL might be unsafe - proceed with caution
+                                    {% endif %}
+                                </h5>
+                                <p class="mb-0">
+                                    {% if prediction %}
+                                    Our analysis found no significant suspicious patterns or malicious indicators in this URL.
+                                    {% else %}
+                                    Our analysis detected potentially malicious patterns in this URL. Review the details below.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-5">
+                        <div class="card">
+                            <div class="card-header p-2 {% if details.get('threat_level') == 'Low' %}bg-success{% elif details.get('threat_level') == 'Medium' %}bg-warning{% elif details.get('threat_level') == 'High' %}bg-danger{% elif details.get('threat_level') == 'Critical' %}bg-dark text-danger{% else %}bg-info{% endif %} text-white">
+                                <h6 class="mb-0 text-center">
+                                    <i class="fas fa-chart-line me-2"></i>URL Reputation Score
+                                </h6>
+                            </div>
+                            <div class="card-body p-3 text-center">
+                                <div class="reputation-score-indicator position-relative mb-2">
+                                    {% set score = details.get('reputation_score', 0) %}
+                                    {% set score_color = 'success' if score >= 80 else 'warning' if score >= 50 else 'danger' %}
+                                    
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-{{ score_color }}" role="progressbar" 
+                                            style="width: {{ score }}%;" 
+                                            aria-valuenow="{{ score }}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    
+                                    <h2 class="mt-2 mb-0 {{ 'text-success' if score >= 80 else 'text-warning' if score >= 50 else 'text-danger' }}">
+                                        {{ score }}/100
+                                    </h2>
+                                </div>
+                                <p class="mb-0 fw-bold">
+                                    Threat Level: 
+                                    <span class="badge bg-{{ 'success' if details.get('threat_level') == 'Low' else 
+                                                          'warning' if details.get('threat_level') == 'Medium' else 
+                                                          'danger' if details.get('threat_level') == 'High' else 
+                                                          'dark' if details.get('threat_level') == 'Critical' else 'info' }}">
+                                        {{ details.get('threat_level', 'Unknown') }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <h5 class="mb-2">URL Analysis:</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-group mb-3">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        URL Length
+                                        <span class="badge bg-primary rounded-pill">{{ details.url_length }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Contains IP Address
+                                        <span class="badge {% if details.has_ip %}bg-danger{% else %}bg-success{% endif %} rounded-pill">
+                                            {{ "Yes" if details.has_ip else "No" }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Number of Dots
+                                        <span class="badge {% if details.dot_count > 3 %}bg-warning{% else %}bg-success{% endif %} rounded-pill">
+                                            {{ details.dot_count }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Number of Hyphens
+                                        <span class="badge {% if details.hyphen_count > 1 %}bg-warning{% else %}bg-success{% endif %} rounded-pill">
+                                            {{ details.hyphen_count }}
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @ Symbol Count
+                                        <span class="badge {% if details.at_count > 0 %}bg-danger{% else %}bg-success{% endif %} rounded-pill">
+                                            {{ details.at_count }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Question Mark Count
+                                        <span class="badge {% if details.question_mark_count > 1 %}bg-warning{% else %}bg-success{% endif %} rounded-pill">
+                                            {{ details.question_mark_count }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Equal Sign Count
+                                        <span class="badge {% if details.equal_sign_count > 3 %}bg-warning{% else %}bg-success{% endif %} rounded-pill">
+                                            {{ details.equal_sign_count }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Uses HTTPS
+                                        <span class="badge bg-{{ 'success' if details.get('uses_https', False) else 'warning' }} rounded-pill">
+                                            {{ "Yes" if details.get('uses_https', False) else "No" }}
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h5 class="mb-2">Security Assessment:</h5>
+                        {% set category = details.get('category', {'name': 'Legitimate', 'confidence': 0.7, 'risk_level': 0}) %}
+                        <div class="card mb-3 {% if category.name == 'Legitimate' %}bg-success bg-opacity-25{% else %}bg-danger bg-opacity-25{% endif %}">
+                            <div class="card-body p-3">
+                                <h4 class="card-title text-center">
+                                    {% if category.name == 'Malware' %}
+                                    <i class="fas fa-virus text-danger me-2"></i>
+                                    {% elif category.name == 'Phishing' %}
+                                    <i class="fas fa-fish text-danger me-2"></i>
+                                    {% elif category.name == 'Suspicious' %}
+                                    <i class="fas fa-question-circle text-warning me-2"></i>
+                                    {% elif category.name == 'Spam' %}
+                                    <i class="fas fa-envelope text-warning me-2"></i>
+                                    {% elif category.name == 'Defacement' %}
+                                    <i class="fas fa-edit text-warning me-2"></i>
+                                    {% else %}
+                                    <i class="fas fa-shield-alt text-success me-2"></i>
+                                    {% endif %}
+                                    {{ category.name }}
+                                </h4>
+                                
+                                {% if category.name != 'Legitimate' %}
+                                <div class="alert alert-danger py-2 mt-2 small">
+                                    {% if category.name == 'Malware' %}
+                                    This URL may contain harmful software that could damage your device.
+                                    {% elif category.name == 'Phishing' %}
+                                    This URL appears designed to steal your personal information.
+                                    {% elif category.name == 'Suspicious' %}
+                                    This URL has unusual patterns that require caution.
+                                    {% elif category.name == 'Spam' %}
+                                    This URL likely leads to unwanted promotional content.
+                                    {% elif category.name == 'Defacement' %}
+                                    This URL may lead to a vandalized or altered legitimate site.
+                                    {% endif %}
+                                </div>
+                                
+                                {% if details.get('typosquatting_matches') %}
+                                <div class="alert alert-warning py-2 mt-2 small">
+                                    <strong>⚠️ Possible typosquatting detected!</strong><br>
+                                    This URL may be impersonating:
+                                    <ul class="mb-0 ps-3">
+                                        {% for domain in details.get('typosquatting_matches', []) %}
+                                        <li>{{ domain }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                {% else %}
+                                <div class="alert alert-success py-2 mt-2 small">
+                                    No security threats detected with this URL.
+                                </div>
+                                {% endif %}
+                                
+                                <div class="progress mt-3" style="height: 8px;">
+                                    <div class="progress-bar 
+                                        {% if category.name == 'Legitimate' %}bg-success
+                                        {% elif category.risk_level <= 2 %}bg-info
+                                        {% elif category.risk_level == 3 %}bg-warning
+                                        {% else %}bg-danger{% endif %}" 
+                                        role="progressbar" 
+                                        style="width: {{ category.confidence * 100 }}%;" 
+                                        aria-valuenow="{{ category.confidence * 100 }}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <p class="text-center small my-2">Detection Confidence: {{ (category.confidence * 100)|round|int }}%</p>
+                                
+                                <div class="d-flex justify-content-center mt-3">
+                                    <span class="badge 
+                                        {% if category.risk_level >= 4 %}bg-danger
+                                        {% elif category.risk_level == 3 %}bg-warning 
+                                        {% elif category.risk_level >= 1 %}bg-info
+                                        {% else %}bg-success{% endif %} p-2">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        Risk Level: {{ category.risk_level }}/5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if details.threats and details.threats|length > 0 %}
+                <div class="mt-4">
+                    <h5 class="mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Potential Threats Detected:</h5>
+                    <div class="threat-list">
+                        {% for threat in details.threats %}
+                        <div class="card threat-card threat-{{ threat.severity|lower }}">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="threat-icon me-3">
+                                        {% if threat.severity == 'High' %}
+                                        <i class="fas fa-exclamation-circle fa-2x text-danger"></i>
+                                        {% elif threat.severity == 'Medium' %}
+                                        <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                                        {% else %}
+                                        <i class="fas fa-info-circle fa-2x text-info"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1">{{ threat.type }}</h5>
+                                        <span class="badge bg-{{ 'danger' if threat.severity == 'High' else 'warning' if threat.severity == 'Medium' else 'info' }}">
+                                            {{ threat.severity }} Risk
+                                        </span>
+                                        <p class="mb-2 mt-2">{{ threat.description }}</p>
+                                        <p class="mb-0"><strong>Recommendation:</strong> {{ threat.mitigation }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0"><i class="fas fa-history me-2"></i>URL Check History</h3>
+                {% if history and history|length > 0 %}
+                <form method="post" action="{{ url_for('clear_history') }}" onsubmit="return confirmClearHistory()">
+                    <button type="submit" class="btn btn-sm btn-danger btn-clear-history">
+                        <i class="fas fa-trash-alt me-2"></i>Clear History
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if history and history|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>URL</th>
+                                    <th>Date Checked</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in history %}
+                                <tr class="{{ 'table-success' if item.is_safe else 'table-danger' }}">
+                                    <td>
+                                        <span class="badge {{ 'bg-success' if item.is_safe else 'bg-danger' }}">
+                                            {% if item.is_safe %}
+                                            <i class="fas fa-check-circle me-1"></i>SAFE
+                                            {% else %}
+                                            <i class="fas fa-exclamation-triangle me-1"></i>UNSAFE
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-truncate" style="max-width: 300px;">
+                                        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                                            {{ item.url }}
+                                        </a>
+                                    </td>
+                                    <td>{{ item.checked_at }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-secondary copy-url" data-url="{{ item.url }}" data-bs-toggle="tooltip" title="Copy URL">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                            <a href="{{ url_for('dashboard') }}?url={{ item.url }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Check again">
+                                                <i class="fas fa-redo-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>You haven't checked any URLs yet. Enter a URL above to get started.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Safety Tips Card -->
+        <div class="card shadow mt-4">
+            <div class="card-header bg-info text-white">
+                <h3 class="card-title mb-0"><i class="fas fa-lightbulb me-2"></i>URL Safety Tips</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-check-circle text-success me-2"></i>Signs of a Safe URL</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item"><i class="fas fa-lock me-2"></i>Uses HTTPS encryption</li>
+                            <li class="list-group-item"><i class="fas fa-font me-2"></i>Correct spelling of domain names</li>
+                            <li class="list-group-item"><i class="fas fa-certificate me-2"></i>Valid security certificates</li>
+                            <li class="list-group-item"><i class="fas fa-link me-2"></i>Clear, readable URL structure</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-exclamation-triangle text-danger me-2"></i>Warning Signs</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item"><i class="fas fa-at me-2"></i>URLs containing @ symbols</li>
+                            <li class="list-group-item"><i class="fas fa-globe me-2"></i>IP addresses instead of domain names</li>
+                            <li class="list-group-item"><i class="fas fa-exclamation-circle me-2"></i>Excessive subdomains or redirects</li>
+                            <li class="list-group-item"><i class="fas fa-keyboard me-2"></i>Misspelled domain names</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
